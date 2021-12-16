@@ -1,0 +1,82 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik
+  namespace: default
+data:
+  traefik.yaml: |
+    providers:
+      kubernetesIngress: {}
+      kubernetesCRD:
+        allowCrossNamespace: false
+      file:
+        watch: true
+        filename: /etc/traefik/dashboard.yaml
+    log:
+      level: WARN
+      format: json
+    accessLog:
+      bufferingSize: 0
+      format: json
+    metrics:
+      prometheus:
+        addServicesLabels: true
+        entryPoint: metrics
+    global:
+      sendAnonymousUsage: true
+    ping:
+      entryPoint: admin
+    api:
+      dashboard: true
+    entryPoints:
+      metrics:
+        address: ":8002"
+      admin:
+        address: ":8080"
+      web:
+        address: ":80"
+        proxyProtocol:
+          trustedIPs:
+          - 127.0.0.1/8
+      https:
+        address: ":443"
+        http:
+          tls:
+            options: default
+        forwardedHeaders:
+          trustedIPs:
+          - 127.0.0.1/8
+        proxyProtocol:
+          trustedIPs:
+          - 127.0.0.1/8
+    experimental:
+      localPlugins:
+        log4shell:
+          moduleName: github.com/traefik/plugin-log4shell
+        ondemand:
+          moduleName: github.com/acouvreur/traefik-ondemand-plugin
+
+  dashboard.yaml: |
+    tls:
+      options:
+        default:
+          minVersion: VersionTLS12
+    http:
+      routers:
+        dashboard:
+          entryPoints:
+          - admin
+          rule: PathPrefix(`/api`) || PathPrefix(`/dashboard`)
+          service: api@internal
+          middlewares:
+          - auth
+      middlewares:
+        log4shell:
+          plugin:
+            log4shell:
+              errorCode: 500
+        auth:
+          basicAuth:
+            users:
+              - "admin:$2y$05$P1P4Rk8g7zS7p5MeoK/kp.QGQcQ5m8rPs7BqMswI2rpJ1QkW5hZtq"

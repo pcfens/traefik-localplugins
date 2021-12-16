@@ -1,0 +1,93 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: traefik
+  namespace: default
+  labels:
+    app: traefik
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+        name: traefik
+    spec:
+      serviceAccountName: traefik
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: docker.io/pcfens/traefik-plugins:v2.5.5
+        name: traefik
+        resources:
+          limits:
+            cpu: 700m
+            memory: 512Mi
+          requests:
+            cpu: 300m
+            memory: 256Mi
+        ports:
+        - name: http
+          containerPort: 80
+        - name: https
+          containerPort: 443
+        - name: admin
+          containerPort: 8080
+        - name: metrics
+          containerPort: 8002
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/traefik
+            readOnly: true
+      volumes:
+      - name: config-volume
+        configMap:
+          name: traefik
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: traefik-ingress
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: traefik
+  ports:
+    - port: 443
+      name: https
+      targetPort: https
+    - port: 80
+      name: http
+      targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: traefik-admin
+  name: traefik-admin
+  namespace: default
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: admin
+    name: http-admin
+  - port: 8002
+    protocol: TCP
+    targetPort: metrics
+    name: metrics
+  selector:
+    app: traefik
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: traefik
+  namespace: default
+spec:
+  controller: traefik.io/ingress-controller

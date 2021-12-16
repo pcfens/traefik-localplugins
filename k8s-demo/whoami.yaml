@@ -54,6 +54,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.middlewares: default-ondemand-whoami@kubernetescrd,log4shell@file
     traefik.ingress.kubernetes.io/router.entrypoints: web, https
 spec:
+  ingressClassName: traefik
   rules:
   - host: example.com
     http:

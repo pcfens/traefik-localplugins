@@ -89,5 +89,7 @@ kind: IngressClass
 metadata:
   name: traefik
   namespace: default
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: true
 spec:
   controller: traefik.io/ingress-controller

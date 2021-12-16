@@ -7,7 +7,8 @@ metadata:
 data:
   traefik.yaml: |
     providers:
-      kubernetesIngress: {}
+      kubernetesIngress:
+        allowEmptyServices: true
       kubernetesCRD:
         allowCrossNamespace: false
       file:

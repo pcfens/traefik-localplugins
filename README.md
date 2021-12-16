@@ -5,6 +5,9 @@ A demo of Traefik local plugins running in Kubernetes.
 
 To demonstrate that the local plugin is running we'll block exploits against log4j.
 
+To test the ondemand plugin, the service we're testing against will be shut down if it's idle
+for an hour (that value can be chagned at the bottom of `k8s-demo/whoami.yaml`).
+
 ## Prerequisites
 
 This demo can be run in any k8s cluster that isn't already using Traefik, but to follow
@@ -43,6 +46,10 @@ Running `curl -v -H 'Host: example.com' -H 'User-Agent: ${${lower:j}ndi:ldap://1
 
 Running `curl -v -H 'Host: example.com' http://localhost:8000` will return a 200 with
 some information about the request as expected, since you're not trying to exploit anything
+
+If you let things sit idle for an hour or so, you'll see a startup page when you visit
+http://localhost:8080 in your browser. The shutdown is useless for demoing the log4j filter,
+but it works well to demonstrate multiple local plugins running at the same time.
 
 ## Cleaning Up
 

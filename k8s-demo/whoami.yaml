@@ -51,7 +51,7 @@ metadata:
   name: whoami
   namespace: default
   annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: log4shell@file
+    traefik.ingress.kubernetes.io/router.middlewares: default-ondemand-whoami@kubernetescrd,log4shell@file
     traefik.ingress.kubernetes.io/router.entrypoints: web, https
 spec:
   rules:
@@ -65,3 +65,25 @@ spec:
             name:  whoami
             port:
               number: 80
+  - host: localhost
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name:  whoami
+            port:
+              number: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: ondemand-whoami
+  namespace: default
+spec:
+  plugin:
+    ondemand:
+      name: deployment_default_whoami_2
+      serviceUrl: http://traefik-ondemand:10000
+      timeout: 1h

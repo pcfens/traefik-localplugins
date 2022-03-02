@@ -10,8 +10,9 @@ RUN mkdir traefik \
 
 RUN mkdir acouvreur \
     && cd acouvreur \
-    && git clone -b v1.1.1 --depth 1 --single-branch https://github.com/acouvreur/traefik-ondemand-plugin.git
+    && git clone -b v1.2.0 --depth 1 --single-branch https://github.com/acouvreur/traefik-ondemand-plugin.git
 
-FROM docker.io/traefik:2.5.5
+FROM docker.io/traefik:2.6.1
+
 
 COPY --from=downloader /plugins-local /plugins-local
